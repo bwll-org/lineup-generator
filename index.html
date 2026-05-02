@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pittsburgh Pirates 4-Inning Lineup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Pittsburgh Pirates Official Colors */
+        :root {
+            --pirates-gold: #FDB827;
+            --pirates-black: #27251F;
+        }
+        
+        body {
+            background-color: #166534; /* Updated to Grass Green */
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .bg-pirates-gold { background-color: var(--pirates-gold); }
+        .text-pirates-gold { color: var(--pirates-gold); }
+        .bg-pirates-black { background-color: var(--pirates-black); }
+        .border-pirates-black { border-color: var(--pirates-black); }
+        .border-pirates-gold { border-color: var(--pirates-gold); }
+
+        /* Editable fields styling */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background-color 0.2s;
+        }
+        [contenteditable="true"]:hover, [contenteditable="true"]:focus {
+            background-color: rgba(253, 184, 39, 0.1);
+        }
+
+        /* Print formatting */
+        @media print {
+            body { 
+                background-color: white; 
+                padding: 0 !important;
+                gap: 0 !important;
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+            }
+            .no-print { display: none !important; }
+            .print-container { 
+                width: 100%; 
+                max-width: 100%;
+                padding: 0;
+                margin: 0;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+            .print-page-2 {
+                page-break-before: always;
+                break-before: page;
+            }
+            /* Position key + field diagram: single row in print/PDF */
+            .print-field-row {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                align-items: flex-start !important;
+                padding: 0.45rem !important;
+                gap: 0.45rem !important;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            .print-field-row .print-position-key-col {
+                flex: 0 0 34% !important;
+                width: 34% !important;
+                max-width: 34% !important;
+            }
+            .print-field-row .print-field-wrap {
+                flex: 1 1 0 !important;
+                min-width: 0 !important;
+                width: auto !important;
+                max-width: none !important;
+                flex-shrink: 1 !important;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            .print-field-row .print-field-svg {
+                display: block;
+                width: 80% !important;
+                max-width: 80% !important;
+                height: auto !important;
+                aspect-ratio: 1 / 1;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            /* Page 1: compact game row, roster table (header matches page 2 — no print overrides) */
+            .print-container:not(.print-page-2) > .grid.grid-cols-3 {
+                padding: 0.2rem 0.35rem !important;
+                font-size: 10px !important;
+            }
+            .print-container:not(.print-page-2) > .grid.grid-cols-3 > div {
+                padding: 0.2rem 0.35rem !important;
+            }
+            .print-p1-main {
+                padding: 0.35rem 0.5rem !important;
+            }
+            .print-p1-roster-block {
+                margin-bottom: 0.35rem !important;
+            }
+            .print-p1-main .roster-heading {
+                padding: 0.15rem 0.5rem !important;
+                margin-bottom: 0.25rem !important;
+                font-size: 0.7rem !important;
+                line-height: 1.2 !important;
+            }
+            .print-p1-main table.roster-table {
+                font-size: 10pt !important;
+            }
+            .print-p1-main table.roster-table th,
+            .print-p1-main table.roster-table td {
+                padding: 1px 3px !important;
+                line-height: 1.1 !important;
+                border-width: 1px !important;
+            }
+            .print-p1-main table.roster-table thead th {
+                font-size: 10pt !important;
+                padding: 2px 3px !important;
+            }
+            .print-p1-main #roster-body tr {
+                height: auto !important;
+                min-height: 0 !important;
+            }
+            .print-field-row .print-position-key-col h3 {
+                font-size: 1.05rem !important;
+                margin-bottom: 0.2rem !important;
+                padding-bottom: 0.15rem !important;
+            }
+            .print-field-row .print-position-key-col ul {
+                font-size: 9.5pt !important;
+                gap: 0 !important;
+            }
+            .print-field-row .print-position-key-col li {
+                margin-top: 0 !important;
+                margin-bottom: 0.1rem !important;
+            }
+            .print-field-row .print-position-key-col li span {
+                width: 1.35rem !important;
+                height: 1.35rem !important;
+                font-size: 0.65rem !important;
+                margin-right: 0.4rem !important;
+            }
+            .print-field-row .print-position-key-col li.mt-4 {
+                margin-top: 0.25rem !important;
+                padding-top: 0.15rem !important;
+            }
+            .print-container:not(.print-page-2) > .bg-pirates-black:last-of-type {
+                padding: 0.2rem !important;
+                font-size: 8px !important;
+            }
+            .print-page-2 > .p-6 {
+                padding: 0.6rem 0.75rem !important;
+            }
+            .print-page-2 .mb-8 {
+                margin-bottom: 0.45rem !important;
+            }
+            /* Page 2: Role Descriptions — compact for one printed page */
+            .print-page-2 .role-descriptions-panel {
+                padding: 0.45rem 0.55rem !important;
+            }
+            .print-page-2 .role-descriptions-panel > h3 {
+                font-size: 0.9rem !important;
+                margin-bottom: 0.3rem !important;
+                padding-bottom: 0.15rem !important;
+            }
+            .print-page-2 .role-descriptions-prose {
+                font-size: 9pt !important;
+                line-height: 1.25 !important;
+            }
+            .print-page-2 .role-descriptions-prose h4 {
+                font-size: 7.5pt !important;
+                margin-top: 0.2rem !important;
+                margin-bottom: 0.08rem !important;
+                padding-top: 0.08rem !important;
+            }
+            .print-page-2 .role-descriptions-prose h4:first-child {
+                margin-top: 0 !important;
+            }
+            .print-page-2 .role-descriptions-prose p {
+                margin: 0 0 0.28rem 0 !important;
+            }
+            .print-page-2 .role-descriptions-prose p:last-child {
+                margin-bottom: 0 !important;
+            }
+        }
+
+        /* Custom Table Borders */
+        .heavy-table th, .heavy-table td {
+            border: 2px solid var(--pirates-black);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col items-center min-h-screen gap-8">
+
+    <div class="no-print w-full max-w-4xl rounded-lg border-4 border-pirates-black bg-white shadow-xl overflow-hidden">
+        <div class="bg-pirates-black text-pirates-gold px-4 py-3 border-b-4 border-pirates-gold">
+            <h2 class="text-lg font-black uppercase tracking-wider">Lineup prefill</h2>
+            <p class="text-gray-300 text-xs font-semibold mt-1">Enter RSVPs below, then use Randomize and Fill to update the printable sheets.</p>
+        </div>
+        <form id="lineup-prefill-form" class="p-4 md:p-6 space-y-4" onsubmit="return false;">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <label class="block">
+                    <span class="text-xs font-black uppercase tracking-wider text-pirates-black">Opponent</span>
+                    <input id="form-opponent" type="text" class="mt-1 w-full rounded border-2 border-pirates-black px-3 py-2 text-sm font-semibold text-pirates-black focus:outline-none focus:ring-2 focus:ring-pirates-gold" placeholder="Team name" autocomplete="off" />
+                </label>
+                <label class="block">
+                    <span class="text-xs font-black uppercase tracking-wider text-pirates-black">Date</span>
+                    <input id="form-date" type="date" class="mt-1 w-full rounded border-2 border-pirates-black px-3 py-2 text-sm font-semibold text-pirates-black focus:outline-none focus:ring-2 focus:ring-pirates-gold" />
+                </label>
+                <label class="block">
+                    <span class="text-xs font-black uppercase tracking-wider text-pirates-black">Field</span>
+                    <input id="form-field" type="text" class="mt-1 w-full rounded border-2 border-pirates-black px-3 py-2 text-sm font-semibold text-pirates-black focus:outline-none focus:ring-2 focus:ring-pirates-gold" placeholder="Field name" autocomplete="off" />
+                </label>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label class="block">
+                    <span class="text-xs font-black uppercase tracking-wider text-pirates-black">Players who RSVPed</span>
+                    <span class="block text-[11px] text-gray-500 font-medium mt-0.5">One name per line — each inning gets P, C, 1B–RF plus 2 BP; no player repeats the same position across innings</span>
+                    <textarea id="form-players" rows="6" class="mt-1 w-full rounded border-2 border-pirates-black px-3 py-2 text-sm font-semibold text-pirates-black focus:outline-none focus:ring-2 focus:ring-pirates-gold resize-y" placeholder="Alex&#10;Jordan&#10;…"></textarea>
+                </label>
+                <label class="block">
+                    <span class="text-xs font-black uppercase tracking-wider text-pirates-black">Coaches who RSVPed</span>
+                    <span class="block text-[11px] text-gray-500 font-medium mt-0.5">One name per line — same coach won’t repeat the same role (row) across innings when possible; defense/offense each get their own shuffle</span>
+                    <textarea id="form-coaches" rows="6" class="mt-1 w-full rounded border-2 border-pirates-black px-3 py-2 text-sm font-semibold text-pirates-black focus:outline-none focus:ring-2 focus:ring-pirates-gold resize-y" placeholder="Coach Sam&#10;Coach Pat&#10;…"></textarea>
+                </label>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 pt-2">
+                <button type="button" id="randomize-fill-btn" class="bg-pirates-gold text-pirates-black font-black uppercase tracking-wider text-sm px-6 py-3 rounded border-2 border-pirates-black shadow hover:brightness-95 active:scale-[0.98] transition">
+                    Randomize and Fill
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Page 1: Roster + Position Key -->
+    <div class="print-container w-full max-w-4xl bg-white shadow-2xl rounded-lg overflow-hidden border-4 border-pirates-black">
+        <div class="bg-pirates-black text-white p-6 relative border-b-8 border-pirates-gold flex items-center">
+            <div class="flex items-center gap-4">
+                <img src="pirates.jpg" alt="Pittsburgh Pirates" class="h-14 w-auto max-h-16 object-contain shrink-0" />
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-black tracking-wider uppercase text-pirates-gold mb-1">Pirates Baseball</h1>
+                    <h2 class="text-lg font-bold tracking-widest text-gray-300">4-Inning Rapid Lineup</h2>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-0 border-b-4 border-pirates-black bg-gray-50 text-sm font-bold uppercase">
+            <div class="p-3 border-r-2 border-pirates-black flex">
+                <span class="text-gray-500 mr-2">Opponent:</span>
+                <span class="flex-1 text-pirates-black border-b border-dashed border-gray-400" contenteditable="true" data-sync="opponent"></span>
+            </div>
+            <div class="p-3 border-r-2 border-pirates-black flex">
+                <span class="text-gray-500 mr-2">Date:</span>
+                <span class="flex-1 text-pirates-black border-b border-dashed border-gray-400" contenteditable="true" data-sync="date"></span>
+            </div>
+            <div class="p-3 flex">
+                <span class="text-gray-500 mr-2">Field:</span>
+                <span class="flex-1 text-pirates-black border-b border-dashed border-gray-400" contenteditable="true" data-sync="field"></span>
+            </div>
+        </div>
+        <div class="print-p1-main p-6">
+            <div class="print-p1-roster-block mb-8">
+                <h3 class="roster-heading bg-pirates-gold text-pirates-black font-black text-xl p-2 pl-4 uppercase tracking-wider mb-2 border-2 border-pirates-black inline-block">Batting & Fielding Roster</h3>
+                <table class="roster-table w-full text-center heavy-table border-collapse text-[10pt]">
+                    <thead>
+                        <tr class="bg-pirates-black text-white uppercase text-[10pt] tracking-wider">
+                            <th class="py-2 w-12 border-pirates-black">Ord</th>
+                            <th class="py-2 w-16 border-pirates-black">#</th>
+                            <th class="py-2 w-1/3 text-left pl-4 border-pirates-black">Player Name</th>
+                            <th class="py-2 bg-pirates-gold text-pirates-black border-pirates-black">Inn 1</th>
+                            <th class="py-2 bg-gray-200 text-pirates-black border-pirates-black">Inn 2</th>
+                            <th class="py-2 bg-pirates-gold text-pirates-black border-pirates-black">Inn 3</th>
+                            <th class="py-2 bg-gray-200 text-pirates-black border-pirates-black">Inn 4</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roster-body" class="font-bold text-pirates-black"></tbody>
+                </table>
+            </div>
+            <div class="print-field-row border-4 border-pirates-black p-6 bg-[#064e3b] text-white flex flex-col md:flex-row items-center md:items-start justify-between rounded-lg shadow-inner gap-6">
+                <div class="print-position-key-col w-full md:w-1/3 md:mb-0 shrink-0">
+                    <h3 class="text-pirates-gold font-black text-2xl uppercase tracking-wider mb-4 border-b-2 border-pirates-gold pb-2 inline-block">Position Key</h3>
+                    <ul class="text-sm md:text-base font-bold space-y-2">
+                        <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-gold text-pirates-black rounded-full mr-3 border-2 border-pirates-black">1</span> Pitcher (P)</li>
+                        <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-gold text-pirates-black rounded-full mr-3 border-2 border-pirates-black">2</span> Catcher (C)</li>
+                        <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-gold text-pirates-black rounded-full mr-3 border-2 border-pirates-black">3</span> 1st Base (1B)</li>
+                        <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-gold text-pirates-black rounded-full mr-3 border-2 border-pirates-black">4</span> 2nd Base (2B)</li>
+                        <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-gold text-pirates-black rounded-full mr-3 border-2 border-pirates-black">5</span> 3rd Base (3B)</li>
+                        <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-gold text-pirates-black rounded-full mr-3 border-2 border-pirates-black">6</span> Shortstop (SS)</li>
+                        <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-gold text-pirates-black rounded-full mr-3 border-2 border-pirates-black">7</span> Left Field (LF)</li>
+                        <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-gold text-pirates-black rounded-full mr-3 border-2 border-pirates-black">8</span> Center Field (CF)</li>
+                        <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-gold text-pirates-black rounded-full mr-3 border-2 border-pirates-black">9</span> Right Field (RF)</li>
+                        <li class="flex items-center mt-4 pt-2"><span class="flex items-center justify-center w-8 h-8 bg-pirates-black text-pirates-gold rounded-full mr-3 border-2 border-pirates-gold">B</span> Bullpen (BP)</li>
+                    </ul>
+                </div>
+                <div class="print-field-wrap w-full md:w-2/3 flex justify-center border-4 border-pirates-black rounded-xl overflow-hidden bg-[#166534] shadow-lg min-w-0">
+                    <svg viewBox="0 0 200 200" class="print-field-svg w-full max-w-[400px] h-auto">
+                        <rect width="200" height="200" fill="#166534" />
+                        <polyline points="10,90 100,180 190,90" fill="none" stroke="white" stroke-width="2" />
+                        <path d="M 100 185 L 165 120 A 45 45 0 0 0 35 120 Z" fill="#b48c66" />
+                        <polygon points="100,170 145,125 100,80 55,125" fill="#166534" />
+                        <polygon points="100,170 105,175 100,180 95,175" fill="white" />
+                        <rect x="140" y="120" width="8" height="8" fill="white" transform="rotate(45 144 124)" />
+                        <rect x="96" y="76" width="8" height="8" fill="white" transform="rotate(45 100 80)" />
+                        <rect x="52" y="120" width="8" height="8" fill="white" transform="rotate(45 56 124)" />
+                        <circle cx="100" cy="125" r="10" fill="#b48c66" />
+                        <rect x="97" y="124" width="6" height="2" fill="white" />
+                        <circle cx="100" cy="125" r="8" fill="#FDB827" stroke="#27251F" stroke-width="1"/><text x="100" y="129" font-size="10" text-anchor="middle" font-weight="bold" fill="#27251F">1</text>
+                        <circle cx="100" cy="190" r="8" fill="#FDB827" stroke="#27251F" stroke-width="1"/><text x="100" y="194" font-size="10" text-anchor="middle" font-weight="bold" fill="#27251F">2</text>
+                        <circle cx="155" cy="115" r="8" fill="#FDB827" stroke="#27251F" stroke-width="1"/><text x="155" y="119" font-size="10" text-anchor="middle" font-weight="bold" fill="#27251F">3</text>
+                        <circle cx="130" cy="85" r="8" fill="#FDB827" stroke="#27251F" stroke-width="1"/><text x="130" y="89" font-size="10" text-anchor="middle" font-weight="bold" fill="#27251F">4</text>
+                        <circle cx="45" cy="115" r="8" fill="#FDB827" stroke="#27251F" stroke-width="1"/><text x="45" y="119" font-size="10" text-anchor="middle" font-weight="bold" fill="#27251F">5</text>
+                        <circle cx="70" cy="85" r="8" fill="#FDB827" stroke="#27251F" stroke-width="1"/><text x="70" y="89" font-size="10" text-anchor="middle" font-weight="bold" fill="#27251F">6</text>
+                        <circle cx="40" cy="40" r="8" fill="#FDB827" stroke="#27251F" stroke-width="1"/><text x="40" y="44" font-size="10" text-anchor="middle" font-weight="bold" fill="#27251F">7</text>
+                        <circle cx="100" cy="25" r="8" fill="#FDB827" stroke="#27251F" stroke-width="1"/><text x="100" y="29" font-size="10" text-anchor="middle" font-weight="bold" fill="#27251F">8</text>
+                        <circle cx="160" cy="40" r="8" fill="#FDB827" stroke="#27251F" stroke-width="1"/><text x="160" y="44" font-size="10" text-anchor="middle" font-weight="bold" fill="#27251F">9</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="bg-pirates-black p-2 text-center text-pirates-gold text-xs font-bold uppercase tracking-widest border-t-4 border-pirates-gold">
+            Let's Go Buccos! 🏴‍☠️
+        </div>
+    </div>
+
+    <!-- Page 2: Coaching + Role Descriptions -->
+    <div class="print-container print-page-2 w-full max-w-4xl bg-white shadow-2xl rounded-lg overflow-hidden border-4 border-pirates-black">
+        <div class="bg-pirates-black text-white p-6 relative border-b-8 border-pirates-gold flex items-center">
+            <div class="flex items-center gap-4">
+                <img src="pirates.jpg" alt="Pittsburgh Pirates" class="h-14 w-auto max-h-16 object-contain shrink-0" />
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-black tracking-wider uppercase text-pirates-gold mb-1">Pirates Baseball</h1>
+                    <h2 class="text-lg font-bold tracking-widest text-gray-300">4-Inning Rapid Lineup</h2>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-0 border-b-4 border-pirates-black bg-gray-50 text-sm font-bold uppercase">
+            <div class="p-3 border-r-2 border-pirates-black flex">
+                <span class="text-gray-500 mr-2">Opponent:</span>
+                <span class="flex-1 text-pirates-black border-b border-dashed border-gray-400" contenteditable="true" data-sync="opponent"></span>
+            </div>
+            <div class="p-3 border-r-2 border-pirates-black flex">
+                <span class="text-gray-500 mr-2">Date:</span>
+                <span class="flex-1 text-pirates-black border-b border-dashed border-gray-400" contenteditable="true" data-sync="date"></span>
+            </div>
+            <div class="p-3 flex">
+                <span class="text-gray-500 mr-2">Field:</span>
+                <span class="flex-1 text-pirates-black border-b border-dashed border-gray-400" contenteditable="true" data-sync="field"></span>
+            </div>
+        </div>
+        <div class="p-6">
+            <div class="mb-8">
+                <h3 class="bg-pirates-black text-white font-black text-xl p-2 pl-4 uppercase tracking-wider mb-2 border-2 border-pirates-black inline-block">Coaching Assignments</h3>
+                <div class="flex flex-col gap-6">
+                    <table class="w-full text-center heavy-table border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-gray-200 text-pirates-black uppercase text-xs tracking-wider">
+                                <th class="py-2 pl-2 text-left w-1/5 border-pirates-black">Defensive Roles</th>
+                                <th class="py-2 bg-pirates-gold w-1/5 border-pirates-black">Inn 1</th>
+                                <th class="py-2 bg-gray-300 w-1/5 border-pirates-black">Inn 2</th>
+                                <th class="py-2 bg-pirates-gold w-1/5 border-pirates-black">Inn 3</th>
+                                <th class="py-2 bg-gray-300 w-1/5 border-pirates-black">Inn 4</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-bold text-pirates-black">
+                            <tr class="h-10">
+                                <td class="text-left pl-2 bg-gray-50 text-xs leading-tight py-1">Coach A:<br><span class="font-normal text-gray-600">Field Coach</span></td>
+                                <td contenteditable="true" class="bg-yellow-50 hover:bg-yellow-100"></td>
+                                <td contenteditable="true" class="bg-white hover:bg-gray-100"></td>
+                                <td contenteditable="true" class="bg-yellow-50 hover:bg-yellow-100"></td>
+                                <td contenteditable="true" class="bg-white hover:bg-gray-100"></td>
+                            </tr>
+                            <tr class="h-10">
+                                <td class="text-left pl-2 bg-gray-50 text-xs leading-tight py-1">Coach B:<br><span class="font-normal text-gray-600">Ball Collector</span></td>
+                                <td contenteditable="true" class="bg-yellow-50 hover:bg-yellow-100"></td>
+                                <td contenteditable="true" class="bg-white hover:bg-gray-100"></td>
+                                <td contenteditable="true" class="bg-yellow-50 hover:bg-yellow-100"></td>
+                                <td contenteditable="true" class="bg-white hover:bg-gray-100"></td>
+                            </tr>
+                            <tr class="h-10">
+                                <td class="text-left pl-2 bg-gray-50 text-xs leading-tight py-1">Coach C:<br><span class="font-normal text-gray-600">RapidBullpen Coach</span></td>
+                                <td contenteditable="true" class="bg-yellow-50 hover:bg-yellow-100"></td>
+                                <td contenteditable="true" class="bg-white hover:bg-gray-100"></td>
+                                <td contenteditable="true" class="bg-yellow-50 hover:bg-yellow-100"></td>
+                                <td contenteditable="true" class="bg-white hover:bg-gray-100"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="w-full text-center heavy-table border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-gray-200 text-pirates-black uppercase text-xs tracking-wider">
+                                <th class="py-2 pl-2 text-left w-1/5 border-pirates-black">Offensive Roles</th>
+                                <th class="py-2 bg-pirates-gold w-1/5 border-pirates-black">Inn 1</th>
+                                <th class="py-2 bg-gray-300 w-1/5 border-pirates-black">Inn 2</th>
+                                <th class="py-2 bg-pirates-gold w-1/5 border-pirates-black">Inn 3</th>
+                                <th class="py-2 bg-gray-300 w-1/5 border-pirates-black">Inn 4</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-bold text-pirates-black">
+                            <tr class="h-10">
+                                <td class="text-left pl-2 bg-gray-50 text-xs leading-tight py-1">Coach A:<br><span class="font-normal text-gray-600">Pitching Machine Operator</span></td>
+                                <td contenteditable="true" class="bg-yellow-50 hover:bg-yellow-100"></td>
+                                <td contenteditable="true" class="bg-white hover:bg-gray-100"></td>
+                                <td contenteditable="true" class="bg-yellow-50 hover:bg-yellow-100"></td>
+                                <td contenteditable="true" class="bg-white hover:bg-gray-100"></td>
+                            </tr>
+                            <tr class="h-10">
+                                <td class="text-left pl-2 bg-gray-50 text-xs leading-tight py-1">Coach B:<br><span class="font-normal text-gray-600">First Base Coach</span></td>
+                                <td contenteditable="true" class="bg-yellow-50 hover:bg-yellow-100"></td>
+                                <td contenteditable="true" class="bg-white hover:bg-gray-100"></td>
+                                <td contenteditable="true" class="bg-yellow-50 hover:bg-yellow-100"></td>
+                                <td contenteditable="true" class="bg-white hover:bg-gray-100"></td>
+                            </tr>
+                            <tr class="h-10">
+                                <td class="text-left pl-2 bg-gray-50 text-xs leading-tight py-1">Coach C:<br><span class="font-normal text-gray-600">Dugout / Lineup Coordinator</span></td>
+                                <td contenteditable="true" class="bg-yellow-50 hover:bg-yellow-100"></td>
+                                <td contenteditable="true" class="bg-white hover:bg-gray-100"></td>
+                                <td contenteditable="true" class="bg-yellow-50 hover:bg-yellow-100"></td>
+                                <td contenteditable="true" class="bg-white hover:bg-gray-100"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="role-descriptions-panel border-4 border-pirates-black p-4 sm:p-6 bg-[#064e3b] text-white rounded-lg shadow-inner">
+                <h3 class="text-pirates-gold font-black text-xl sm:text-2xl uppercase tracking-wider mb-3 border-b-2 border-pirates-gold pb-1.5 sm:pb-2 inline-block">Role Descriptions</h3>
+                <div class="role-descriptions-prose text-[11px] sm:text-xs text-white/95 leading-snug space-y-2">
+                    <h4 class="text-pirates-gold font-black text-xs uppercase tracking-wider">Defense</h4>
+                    <p><strong class="text-white font-bold">Field Coach</strong> - Coach players before/during after the play. Remind players how many outs, where's the play, how many runners, correct positioning. Be a coach of the game!</p>
+                    <p><strong class="text-white font-bold">Ball Collector</strong> - Keep the field clean! You are responsible for collecting and bagging all foul/passed balls. Remind your catcher each inning to roll you any caught balls.</p>
+                    <p><strong class="text-white font-bold">RapidBullpen Coach</strong> - EXTREMELY important to make both players pitch at the same cadence and in unison. This is controlled by verbal cues with the 3-Step Method. Please refer to the RapidBullpen Guide for further instruction.</p>
+                    <h4 class="text-pirates-gold font-black text-xs uppercase tracking-wider pt-0.5">Offense</h4>
+                    <p><strong class="text-white font-bold">Pitching Machine Operator</strong> - You control the pace of play! Be quick, and be consistent. Present baseball to batter by holding overhead then smoothly feed ball into chute. If balls are damp, use towel to quickly dry before loading. Machine WON'T fire damp/wet baseballs. No more than 3 pitches!</p>
+                    <p><strong class="text-white font-bold">First Base Coach</strong> - Encourage players to run hard through first base and turn off into foul territory. Remind runners how many outs. Help with clearing the bases every time the defense records three outs.</p>
+                    <p><strong class="text-white font-bold">Dugout / Lineup Coordinator</strong> - Make sure players are ready to bat. Always have your on-deck and in-the-hole batters ready to go. Encourage them to hustle to home plate!</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-pirates-black p-2 text-center text-pirates-gold text-xs font-bold uppercase tracking-widest border-t-4 border-pirates-gold">
+            Let's Go Buccos! 🏴‍☠️
+        </div>
+    </div>
+
+    <script>
+        // Generate 11 empty rows for the roster
+        const tbody = document.getElementById('roster-body');
+        const numRows = 11;
+
+        for (let i = 1; i <= numRows; i++) {
+            const tr = document.createElement('tr');
+            // Alternating row colors for readability when printing
+            tr.className = i % 2 === 0 ? "bg-gray-50 h-10" : "bg-white h-10";
+            
+            tr.innerHTML = `
+                <td class="bg-pirates-black text-white border-pirates-black">${i}</td>
+                <td contenteditable="true" class="border-pirates-black font-normal text-gray-500 hover:bg-gray-100"></td>
+                <td contenteditable="true" class="text-left pl-4 border-pirates-black uppercase tracking-wide hover:bg-gray-100"></td>
+                <td contenteditable="true" class="border-pirates-black bg-yellow-50 hover:bg-yellow-100 focus:bg-yellow-100"></td>
+                <td contenteditable="true" class="border-pirates-black hover:bg-gray-200 focus:bg-gray-200"></td>
+                <td contenteditable="true" class="border-pirates-black bg-yellow-50 hover:bg-yellow-100 focus:bg-yellow-100"></td>
+                <td contenteditable="true" class="border-pirates-black hover:bg-gray-200 focus:bg-gray-200"></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        document.querySelectorAll('[data-sync]').forEach((el) => {
+            el.addEventListener('input', () => {
+                const key = el.getAttribute('data-sync');
+                document.querySelectorAll(`[data-sync="${key}"]`).forEach((other) => {
+                    if (other !== el) other.textContent = el.textContent;
+                });
+            });
+        });
+
+        function parseMultiline(text) {
+            return text.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+        }
+
+        function shuffle(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function setSyncField(key, value) {
+            document.querySelectorAll(`[data-sync="${key}"]`).forEach((el) => {
+                el.textContent = value;
+            });
+        }
+
+        /**
+         * 3 roles × 4 innings. Each inning assigns the triple of coaches to rows (roles) with a shuffle.
+         * A coach must not repeat the same row in a later inning (same as players not repeating a position),
+         * when a valid shuffle exists. With exactly 3 coaches they each work every inning but only 3 roles
+         * exist, so inning 4 may require a repeat — we relax only then.
+         */
+        function buildCoachGrid3x4(c) {
+            const n = c.length;
+            const grid = [
+                ['', '', '', ''],
+                ['', '', '', ''],
+                ['', '', '', ''],
+            ];
+            if (n === 0) return grid;
+
+            const rowsUsedByCoach = new Map();
+
+            for (let j = 0; j < 4; j++) {
+                let triple;
+                if (n >= 3) {
+                    triple = [c[j % n], c[(j + 1) % n], c[(j + 2) % n]];
+                } else if (n === 2) {
+                    triple = j % 2 === 0 ? [c[0], c[1], c[0]] : [c[1], c[0], c[1]];
+                } else {
+                    triple = [c[0], c[0], c[0]];
+                }
+
+                let assign = null;
+                for (let attempt = 0; attempt < 100; attempt++) {
+                    const cand = shuffle(triple.slice());
+                    let ok = true;
+                    for (let r = 0; r < 3; r++) {
+                        const coach = cand[r];
+                        const used = rowsUsedByCoach.get(coach);
+                        if (used && used.has(r)) {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    if (ok) {
+                        assign = cand;
+                        break;
+                    }
+                }
+                if (!assign) {
+                    assign = shuffle(triple.slice());
+                }
+
+                for (let r = 0; r < 3; r++) {
+                    const coach = assign[r];
+                    grid[r][j] = coach;
+                    if (!rowsUsedByCoach.has(coach)) rowsUsedByCoach.set(coach, new Set());
+                    rowsUsedByCoach.get(coach).add(r);
+                }
+            }
+            return grid;
+        }
+
+        function applyCoachGrid(table, grid) {
+            table.querySelectorAll('tbody tr').forEach((tr, r) => {
+                for (let j = 0; j < 4; j++) {
+                    const cell = tr.cells[j + 1];
+                    if (cell) cell.textContent = grid[r][j] ?? '';
+                }
+            });
+        }
+
+        const STANDARD_POSITIONS = ['P', 'C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF'];
+        const NUM_INNINGS = 4;
+
+        /** Labels for one inning: nine positions plus two BP (length must equal roster size). */
+        function inningLabelMultiset(numPlayers) {
+            if (numPlayers === 11) return [...STANDARD_POSITIONS, 'BP', 'BP'];
+            const k = Math.max(0, numPlayers - 2);
+            return [...STANDARD_POSITIONS.slice(0, k), 'BP', 'BP'];
+        }
+
+        /**
+         * Assign one inning column: bijection from players to labels, no label repeats a player's
+         * earlier innings (same string, including BP).
+         */
+        function assignInningColumn(grid, inn, numPlayers, labels) {
+            const order = shuffle([...Array(numPlayers).keys()]);
+            const usedLabelIdx = new Set();
+
+            function dfs(i) {
+                if (i === numPlayers) return true;
+                const p = order[i];
+                const tryIdx = shuffle([...Array(labels.length).keys()]);
+                for (const li of tryIdx) {
+                    if (usedLabelIdx.has(li)) continue;
+                    const lab = labels[li];
+                    let conflict = false;
+                    for (let t = 0; t < inn; t++) {
+                        if (grid[p][t] === lab) {
+                            conflict = true;
+                            break;
+                        }
+                    }
+                    if (conflict) continue;
+                    usedLabelIdx.add(li);
+                    grid[p][inn] = lab;
+                    if (dfs(i + 1)) return true;
+                    usedLabelIdx.delete(li);
+                    grid[p][inn] = '';
+                }
+                return false;
+            }
+
+            return dfs(0);
+        }
+
+        /**
+         * Each inning: every standard position once, plus two BP (11 slots for 11 players).
+         * No player gets the same position label in two different innings.
+         */
+        function buildPlayerPositionGrid(numPlayers) {
+            const grid = Array.from({ length: numPlayers }, () => Array(NUM_INNINGS).fill(''));
+            if (numPlayers < 2) return grid;
+
+            const labels = inningLabelMultiset(numPlayers);
+            if (labels.length !== numPlayers) {
+                while (labels.length < numPlayers) labels.unshift('OF');
+                while (labels.length > numPlayers) labels.pop();
+            }
+
+            for (let mega = 0; mega < 400; mega++) {
+                for (let p = 0; p < numPlayers; p++) {
+                    for (let inn = 0; inn < NUM_INNINGS; inn++) grid[p][inn] = '';
+                }
+                let ok = true;
+                for (let inn = 0; inn < NUM_INNINGS; inn++) {
+                    if (!assignInningColumn(grid, inn, numPlayers, labels)) {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (ok) return grid;
+            }
+
+            for (let p = 0; p < numPlayers; p++) {
+                for (let inn = 0; inn < NUM_INNINGS; inn++) grid[p][inn] = '';
+            }
+            for (let inn = 0; inn < NUM_INNINGS; inn++) {
+                const L = shuffle(labels.slice());
+                const P = shuffle([...Array(numPlayers).keys()]);
+                for (let k = 0; k < numPlayers; k++) grid[P[k]][inn] = L[k];
+            }
+            return grid;
+        }
+
+        function applyRosterPositions(rows, grid) {
+            rows.forEach((tr, p) => {
+                const rowGrid = grid[p];
+                if (!rowGrid) return;
+                for (let inn = 0; inn < NUM_INNINGS; inn++) {
+                    const cell = tr.cells[3 + inn];
+                    if (cell) cell.textContent = rowGrid[inn] ?? '';
+                }
+            });
+        }
+
+        document.getElementById('randomize-fill-btn').addEventListener('click', () => {
+            const opponent = document.getElementById('form-opponent').value.trim();
+            const field = document.getElementById('form-field').value.trim();
+            const dateInput = document.getElementById('form-date');
+            let dateDisplay = '';
+            if (dateInput.value) {
+                const d = new Date(dateInput.value + 'T12:00:00');
+                dateDisplay = d.toLocaleDateString(undefined, {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                });
+            }
+
+            setSyncField('opponent', opponent);
+            setSyncField('date', dateDisplay);
+            setSyncField('field', field);
+
+            const players = shuffle(parseMultiline(document.getElementById('form-players').value));
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((tr, idx) => {
+                const nameCell = tr.cells[2];
+                nameCell.textContent = players[idx] ?? '';
+            });
+
+            const activePlayers = Math.min(players.length, rows.length);
+            if (activePlayers < 2) {
+                rows.forEach((tr) => {
+                    for (let inn = 0; inn < NUM_INNINGS; inn++) {
+                        const cell = tr.cells[3 + inn];
+                        if (cell) cell.textContent = '';
+                    }
+                });
+            } else {
+                const posGrid = buildPlayerPositionGrid(activePlayers);
+                const fullGrid = Array.from({ length: rows.length }, (_, p) =>
+                    p < activePlayers ? posGrid[p] : ['', '', '', '']
+                );
+                applyRosterPositions(rows, fullGrid);
+            }
+
+            const coaches = parseMultiline(document.getElementById('form-coaches').value);
+            const coachTables = document.querySelectorAll('.print-page-2 .mb-8 table');
+            if (!coaches.length) {
+                coachTables.forEach((table) => applyCoachGrid(table, buildCoachGrid3x4([])));
+            } else {
+                applyCoachGrid(coachTables[0], buildCoachGrid3x4(shuffle(coaches.slice())));
+                applyCoachGrid(coachTables[1], buildCoachGrid3x4(shuffle(coaches.slice())));
+            }
+        });
+    </script>
+</body>
+</html>
