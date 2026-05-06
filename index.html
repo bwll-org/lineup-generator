@@ -245,7 +245,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <label class="block">
                     <span class="text-xs font-black uppercase tracking-wider text-pirates-black">Players who RSVPed</span>
-                    <span class="block text-[11px] text-gray-500 font-medium mt-0.5">One name per line — each inning gets P, C, 1B–RF plus 2 BP; no player repeats the same position across innings</span>
+                    <span class="block text-[11px] text-gray-500 font-medium mt-0.5">One name per line — positions scale with headcount (5 = infield + P; add C, CF, RF, LF; BP only at 10–11; extra players = bench B); no same position label for one player across innings</span>
                     <textarea id="form-players" rows="6" class="mt-1 w-full rounded border-2 border-pirates-black px-3 py-2 text-sm font-semibold text-pirates-black focus:outline-none focus:ring-2 focus:ring-pirates-gold resize-y" placeholder="Alex&#10;Jordan&#10;…"></textarea>
                 </label>
                 <label class="block">
@@ -314,7 +314,8 @@
                         <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-gold text-pirates-black rounded-full mr-3 border-2 border-pirates-black">7</span> Left Field (LF)</li>
                         <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-gold text-pirates-black rounded-full mr-3 border-2 border-pirates-black">8</span> Center Field (CF)</li>
                         <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-gold text-pirates-black rounded-full mr-3 border-2 border-pirates-black">9</span> Right Field (RF)</li>
-                        <li class="flex items-center mt-4 pt-2"><span class="flex items-center justify-center w-8 h-8 bg-pirates-black text-pirates-gold rounded-full mr-3 border-2 border-pirates-gold">B</span> Bullpen (BP)</li>
+                        <li class="flex items-center mt-4 pt-2"><span class="flex items-center justify-center min-w-[2rem] h-8 px-1 bg-pirates-black text-pirates-gold rounded-full mr-3 border-2 border-pirates-gold text-[10px] leading-none">BP</span> Bullpen (BP)</li>
+                        <li class="flex items-center"><span class="flex items-center justify-center w-8 h-8 bg-pirates-black text-pirates-gold rounded-full mr-3 border-2 border-pirates-gold">B</span> Bench (B)</li>
                     </ul>
                 </div>
                 <div class="print-field-wrap w-full md:w-2/3 flex justify-center border-4 border-pirates-black rounded-xl overflow-hidden bg-team-grass shadow-lg min-w-0">
@@ -646,9 +647,9 @@
         });
 
         applyTeamBranding();
-        // Generate 11 empty rows for the roster
+        // Roster rows (enough for full field + 2 BP + several bench spots)
         const tbody = document.getElementById('roster-body');
-        const numRows = 11;
+        const numRows = 18;
 
         for (let i = 1; i <= numRows; i++) {
             const tr = document.createElement('tr');
@@ -751,13 +752,28 @@
             });
         }
 
-        const STANDARD_POSITIONS = ['P', 'C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF'];
-
-        /** Labels for one inning: nine positions plus two BP (length must equal roster size). */
+        /**
+         * Labels for one inning (length === numPlayers). Order matches how spots are added as roster grows.
+         * 5: P + corners; 6: +C; 7: +CF; 8: +RF; 9: +LF; 10–11: +BP; 12+: extra slots are bench B.
+         */
         function inningLabelMultiset(numPlayers) {
-            if (numPlayers === 11) return [...STANDARD_POSITIONS, 'BP', 'BP'];
-            const k = Math.max(0, numPlayers - 2);
-            return [...STANDARD_POSITIONS.slice(0, k), 'BP', 'BP'];
+            if (numPlayers <= 0) return [];
+            const five = ['P', '1B', '2B', 'SS', '3B'];
+            const six = ['P', 'C', '1B', '2B', 'SS', '3B'];
+            const seven = [...six, 'CF'];
+            const eight = [...seven, 'RF'];
+            const nine = [...eight, 'LF'];
+
+            if (numPlayers < 5) return five.slice(0, numPlayers);
+            if (numPlayers === 5) return five.slice();
+            if (numPlayers === 6) return six.slice();
+            if (numPlayers === 7) return seven.slice();
+            if (numPlayers === 8) return eight.slice();
+            if (numPlayers === 9) return nine.slice();
+            if (numPlayers === 10) return [...nine, 'BP'];
+            if (numPlayers === 11) return [...nine, 'BP', 'BP'];
+            const benchCount = numPlayers - 11;
+            return [...nine, 'BP', 'BP', ...Array(benchCount).fill('B')];
         }
 
         /**
@@ -796,7 +812,7 @@
         }
 
         /**
-         * Each inning: every standard position once, plus two BP (11 slots for 11 players).
+         * Each inning: bijection from players to the multiset from inningLabelMultiset.
          * No player gets the same position label in two different innings.
          */
         function buildPlayerPositionGrid(numPlayers, numInnings) {
@@ -804,10 +820,6 @@
             if (numPlayers < 2) return grid;
 
             const labels = inningLabelMultiset(numPlayers);
-            if (labels.length !== numPlayers) {
-                while (labels.length < numPlayers) labels.unshift('OF');
-                while (labels.length > numPlayers) labels.pop();
-            }
 
             for (let mega = 0; mega < 400; mega++) {
                 for (let p = 0; p < numPlayers; p++) {
