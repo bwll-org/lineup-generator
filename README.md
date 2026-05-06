@@ -1,5 +1,7 @@
 # Lineup generator
 
+**[See it in action](https://bwll-org.github.io/lineup-generator/)** — live demo on GitHub Pages.
+
 Single-page tool for youth **rapid lineups**: enter game details and RSVP lists, then generate shuffled **field positions** and **coaching assignments** on printable sheets. Open `index.html` in a browser (no build step). Team logos live in `images/`.
 
 ## Lineup prefill form
